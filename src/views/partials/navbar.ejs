@@ -1,0 +1,27 @@
+<nav>
+    <div class="container">
+        <a href="/" class="logo">DevConnect</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li class="guest-link"><a href="/login">Login</a></li>
+            <li class="guest-link"><a href="/register">Register</a></li>
+            <li class="user-link" style="display: none;"><a href="/dashboard">Dashboard</a></li>
+            <li class="user-link" style="display: none;"><a href="#" id="logout-link">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<script>
+    const hasToken = document.cookie.includes('token=');
+    if (hasToken) {
+        document.querySelectorAll('.guest-link').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.user-link').forEach(el => el.style.display = 'block');
+    }
+
+    document.getElementById('logout-link')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await fetch('/api/auth/logout');
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        window.location.href = '/login';
+    });
+</script>
