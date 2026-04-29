@@ -37,7 +37,7 @@
         <section>
             <h2>Your Recent Posts</h2>
             <div id="posts-container" class="post-grid">
-                <!-- Posts will load here -->
+
             </div>
         </section>
     </div>
@@ -65,16 +65,25 @@
             const container = document.getElementById('posts-container');
 
             if (result.success) {
-                container.innerHTML = result.data.map(post => `
-                    <div class="card">
-                        <h3>${post.title}</h3>
-                        <p style="color: var(--text-light); margin: 1rem 0;">${post.content.substring(0, 150)}...</p>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>❤️ ${post.likes ? post.likes.length : 0}</span>
-                            <button onclick="deletePost('${post._id}')" style="background:none; border:none; color:red; cursor:pointer; font-weight:600;">Delete</button>
+                let htmlContent = '';
+                for (let i = 0; i < result.data.length; i++) {
+                    let post = result.data[i];
+                    let likesCount = 0;
+                    if (post.likes) {
+                        likesCount = post.likes.length;
+                    }
+                    htmlContent += `
+                        <div class="card">
+                            <h3>${post.title}</h3>
+                            <p style="color: var(--text-light); margin: 1rem 0;">${post.content.substring(0, 150)}...</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>❤️ ${likesCount}</span>
+                                <button onclick="deletePost('${post._id}')" style="background:none; border:none; color:red; cursor:pointer; font-weight:600;">Delete</button>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }
+                container.innerHTML = htmlContent;
             }
         }
 

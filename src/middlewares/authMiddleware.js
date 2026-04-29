@@ -2,7 +2,11 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const protect = async (req, res, next) => {
-    let token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    let token = req.cookies.token;
+
+    if (!token && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+        token = req.headers.authorization.split(' ')[1];
+    }
 
     if (!token) {
         if (req.accepts('html')) return res.redirect('/login');

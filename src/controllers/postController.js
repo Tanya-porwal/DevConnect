@@ -1,15 +1,11 @@
 const Post = require('../models/Post');
 
-// @desc    Get all posts
-// @route   GET /api/posts
-// @access  Public
 exports.getPosts = async (req, res) => {
     try {
         const { search } = req.query;
         let posts;
 
         if (search) {
-            // Simple search with regex
             posts = await Post.find({
                 $or: [
                     { title: { $regex: search, $options: 'i' } },
@@ -17,7 +13,6 @@ exports.getPosts = async (req, res) => {
                 ]
             }).populate('author', 'name');
         } else {
-            // Just get all posts
             posts = await Post.find().populate('author', 'name').sort('-createdAt');
         }
 
@@ -33,9 +28,6 @@ exports.getPosts = async (req, res) => {
     }
 };
 
-// @desc    Get single post
-// @route   GET /api/posts/:id
-// @access  Public
 exports.getPost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate('author', 'name');
@@ -48,9 +40,6 @@ exports.getPost = async (req, res) => {
     }
 };
 
-// @desc    Create new post
-// @route   POST /api/posts
-// @access  Private
 exports.createPost = async (req, res) => {
     try {
         req.body.author = req.user.id;
@@ -61,9 +50,6 @@ exports.createPost = async (req, res) => {
     }
 };
 
-// @desc    Update post
-// @route   PATCH /api/posts/:id
-// @access  Private
 exports.updatePost = async (req, res) => {
     try {
         let post = await Post.findById(req.params.id);
@@ -72,7 +58,6 @@ exports.updatePost = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Post not found' });
         }
 
-        // Check ownership
         if (post.author.toString() !== req.user.id) {
             return res.status(401).json({ success: false, message: 'User not authorized to update this post' });
         }
@@ -88,9 +73,6 @@ exports.updatePost = async (req, res) => {
     }
 };
 
-// @desc    Delete post
-// @route   DELETE /api/posts/:id
-// @access  Private
 exports.deletePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
@@ -99,7 +81,6 @@ exports.deletePost = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Post not found' });
         }
 
-        // Check ownership
         if (post.author.toString() !== req.user.id) {
             return res.status(401).json({ success: false, message: 'User not authorized to delete this post' });
         }
@@ -111,9 +92,6 @@ exports.deletePost = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
-// @desc    Like/Unlike post
-// @route   PUT /api/posts/:id/like
-// @access  Private
 exports.likePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
@@ -122,14 +100,17 @@ exports.likePost = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Post not found' });
         }
 
-        // Check if the post has already been liked by this user
-        const alreadyLiked = post.likes.find(like => like.toString() === req.user.id);
+        let alreadyLikedIndex = -1;
+        for (let i = 0; i < post.likes.length; i++) {
+            if (post.likes[i].toString() === req.user.id) {
+                alreadyLikedIndex = i;
+                break;
+            }
+        }
 
-        if (alreadyLiked) {
-            // Unlike
-            post.likes = post.likes.filter(like => like.toString() !== req.user.id);
+        if (alreadyLikedIndex !== -1) {
+            post.likes.splice(alreadyLikedIndex, 1);
         } else {
-            // Like
             post.likes.unshift(req.user.id);
         }
 
