@@ -1,9 +1,6 @@
 const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 
-// @desc    Get comments for a post
-// @route   GET /api/posts/:postId/comments
-// @access  Public
 exports.getComments = async (req, res) => {
     try {
         const comments = await Comment.find({ post: req.params.postId }).populate('author', 'name');
@@ -13,9 +10,6 @@ exports.getComments = async (req, res) => {
     }
 };
 
-// @desc    Add comment to a post
-// @route   POST /api/posts/:postId/comments
-// @access  Private
 exports.addComment = async (req, res) => {
     try {
         req.body.post = req.params.postId;
@@ -35,9 +29,6 @@ exports.addComment = async (req, res) => {
     }
 };
 
-// @desc    Delete comment
-// @route   DELETE /api/comments/:id
-// @access  Private
 exports.deleteComment = async (req, res) => {
     try {
         const comment = await Comment.findById(req.params.id);
@@ -46,7 +37,6 @@ exports.deleteComment = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Comment not found' });
         }
 
-        // Check ownership
         if (comment.author.toString() !== req.user.id) {
             return res.status(401).json({ success: false, message: 'User not authorized to delete this comment' });
         }

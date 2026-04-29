@@ -1,8 +1,5 @@
 const User = require('../models/User');
 
-// @desc    Get user profile
-// @route   GET /api/users/profile
-// @access  Private
 exports.getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -12,9 +9,6 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-// @desc    Update user profile
-// @route   PATCH /api/users/profile
-// @access  Private
 exports.updateProfile = async (req, res) => {
     try {
         const fieldsToUpdate = {

@@ -12,7 +12,6 @@ const { protect } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-// Nested routes for comments
 router.route('/:postId/comments')
     .get(getComments)
     .post(protect, addComment);
@@ -29,8 +28,4 @@ router.route('/:id')
 router.put('/:id/like', protect, likePost);
 
 module.exports = router;
-// Original commented code preserved:
-// const postController = require("../controllers/postController");
-// router.get("/", postController.getPostList);
-// router.post("/", postController.addNewPost);
-// router.put("/:id", postController.sendPostById);
+
